@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <meta charset="utf-8" />
+        <title>cmlzaGk</title>
+        <link rel="stylesheet" href="/theme/css/main.css" />
+</head>
+
+<body id="index" class="home">
+        <header id="banner" class="body">
+                <h1><a href="/">cmlzaGk </a></h1>
+                <nav><ul>
+                    <li><a href="/pages/about.html">about</a></li>
+                    <li><a href="/category/python.html">Python</a></li>
+                </ul></nav>
+        </header><!-- /#banner -->
+
+            <aside id="featured" class="body">
+                <article>
+                    <h1 class="entry-title"><a href="/python-project-layout.html">Python Project Layout For Flask and Everything</a></h1>
+<footer class="post-info">
+        <abbr class="published" title="2019-09-03T10:20:00-07:00">
+                Published: Tue 03 September 2019
+        </abbr>
+		<br />
+        <abbr class="modified" title="2019-09-03T10:20:00-07:00">
+                Updated: Tue 03 September 2019
+        </abbr>
+
+        <address class="vcard author">
+                By                         <a class="url fn" href="/author/rishi-maker.html">Rishi Maker</a>
+        </address>
+<p>In <a href="/category/python.html">Python</a>.</p>
+<p>tags: <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/docker.html">docker</a> </p>
+</footer><!-- /.post-info --><p>I will walk through a minimal python flask application to highlight the project layout approach I took.</p>
+<p>The driving factor is co-developing a self-contained library class along with the main application</p>
+<h2>Summary</h2>
+<p>I will highlight the following areas using a sample project which can be found <a href="https://github.com/cmlzaGk/sampleflask">here</a></p>
+<ul>
+<li>Project layout.</li>
+<li>setup.py, __init__.py and requirements.txt</li>
+<li>Intra-package and inter package references.</li>
+<li>Class factories</li>
+<li>Test cases and code coverage</li>
+<li>DockerFiles</li>
+</ul>
+<h2>Project Layout</h2>
+<p>The project layout looks like this.</p>
+<div class="highlight"><pre><span></span>.
+├── docker-compose.yml
+├── Dockerfile
+├── Dockerfile.unittests
+├── requirements.txt
+├── run_coverage.sh
+├── uwsgi.ini
+└──-bettermath-lib
+    ├── setup.py
+    └── bettermathlib
+        ├── better_random.py
+        ├── __init__.py
+    └── bettermathlib_tests
+        ├── tests_bettermathlib.py
+        ├── __init__.py
+└── randomweb-app
+    ├── setup.py
+    └── randomwebapp_tests
+        ├── tests_basic.py
+        ├── tests_client.py
+        ├── __init__.py
+    └── randomweb_app
+        ├── config.py
+        ├── create_app.py
+        ├── flask_app.py
+        ├── random_creator.py
+        ├── __init__.py
+        └── main
+            ├── views.py
+            ├── __init__.py
+            └── static
+                ├── about.txt
+            └── templates
+                ├── base.html
+                └── betterrandom.html
+</pre></div>
+
+
+<p>A distribution is a folder that can be installed and moved around anywhere.  bettermath-lib and randomweb-app are the self-contained distributions.</p>
+<p>A package is a directory contains other packages or modules and is also called "Import Package" because its importable.</p>
+<p>The file __init__.py is a special file that is executed when a package is imported in the runtime.</p>
+<p>Here bettermpathlib, bettermathlib_tests are packages inside distribution bettermath-lib. randomweb_app and randomwebapp_tests are packages inside distribution randomweb-app, and finally main is a package inside package randomweb_app.</p>
+<h2>setup.py, __init__.py and requirements.txt</h2>
+<p>The three files play a significant role in app development.</p>
+<p>setup.py is part of setuptools and defines properties of a distribution.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">setuptools</span> <span class="kn">import</span> <span class="n">setup</span><span class="p">,</span> <span class="n">find_packages</span>
+
+<span class="n">setup</span><span class="p">(</span>
+    <span class="n">name</span><span class="o">=</span><span class="s1">&#39;randomweb-app&#39;</span><span class="p">,</span>
+    <span class="n">version</span><span class="o">=</span><span class="s1">&#39;1.0&#39;</span><span class="p">,</span>
+    <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Random Webapp&#39;</span><span class="p">,</span>
+    <span class="n">author</span><span class="o">=</span><span class="s1">&#39;Fishy Baker&#39;</span><span class="p">,</span>
+    <span class="n">author_email</span><span class="o">=</span><span class="s1">&#39;fishybaker@hotmail.com&#39;</span><span class="p">,</span>
+    <span class="n">packages</span><span class="o">=</span><span class="n">find_packages</span><span class="p">(),</span>
+    <span class="n">install_requires</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;Flask &gt;= 1.1.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Flask-Bootstrap &gt;= 3.3.7.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;Flask-WTF &gt;= 0.14.2&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;jsonschema &gt;= 3.0.1&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;bettermath-lib &gt;= 1.0&#39;</span>
+    <span class="p">],</span>
+    <span class="n">include_package_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">package_data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;randomweb_app&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;templates/*&#39;</span><span class="p">,</span> <span class="s1">&#39;static/*&#39;</span><span class="p">]}</span>
+<span class="p">)</span>
+</pre></div>
+
+
+<p>There are three main parts of setup.py</p>
+<div class="highlight"><pre><span></span>    <span class="n">packages</span><span class="o">=</span><span class="n">find_packages</span><span class="p">(),</span>
+</pre></div>
+
+
+<p>find_packages is a neat helper to automatically include all packages inside randomweb-app as part of the distributable. The other option would be to create a static python list with a list of packages.</p>
+<div class="highlight"><pre><span></span>    <span class="n">include_package_data</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+    <span class="n">package_data</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;randomweb_app&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;templates/*&#39;</span><span class="p">,</span> <span class="s1">&#39;static/*&#39;</span><span class="p">]}</span>
+</pre></div>
+
+
+<p>By default non python files aka data files are excluded in a package. This is a good place to include them, and they can continue to be referenced by their relative paths anywhere.</p>
+<p>Before, we go over install_requires, lets talk about requirements.txt. requirements.txt is created typically by using the pip freeze command in your virtual env.</p>
+<div class="highlight"><pre><span></span>pip freeze &gt; requirements.txt
+</pre></div>
+
+
+<p>Hence requirements.txt represents the distributions that the application was tested under. It will have specific versions of external distributions.</p>
+<p>The purpose of requirements.txt is to ensure that the production environments are run against specific versions.</p>
+<p>However, it is not part of a distribution, because when we distribute, we would like consumers to obtain the latest and greatest versions of packages like Flask.</p>
+<p>In the distribution, the minimum version the package works with is defined, and that is where install_requires in setup.py comes in.</p>
+<p>Finally a word on __init__.py.  __init__.py plays a crucial role in namespacing the package's contents appropriately.</p>
+<p>The class BetterRandom is in module better_random.py. So a consumer of my distribution would have to import bettermathlib.better_random to access BetterRandom. This is not optimal.</p>
+<p>By directly importing BetterRandom in __init__.py we bring BetterRandom to bettermathlib namespace, and then "import bettermathlib" is good enough to access BetterRandom.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.better_random</span> <span class="kn">import</span> <span class="n">BetterRandom</span>
+</pre></div>
+
+
+<h2>Intra-package and inter package references.</h2>
+<p>References is now where we will see the advantage of keeping packages distributable come in.</p>
+<p>Pip has an option -e, called the editable option, using which pip will reference the local source paths in the deployment index.</p>
+<div class="highlight"><pre><span></span>pip install  --no-deps -e bettermath-lib/
+pip install  --no-deps -e randomweb-app/
+</pre></div>
+
+
+<p>After this both the packages are self-contained and installed in the dev environment. We can continue to make code changes without re-installing the packages.</p>
+<p>For referencing modules within a package, we will use the intra-package references :</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">..random_creator</span> <span class="kn">import</span> <span class="n">random_int</span>
+</pre></div>
+
+
+<p>For inter-package references, we can now use absolute references without worrying about where the actual code for the package resides.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">bettermathlib</span> <span class="kn">import</span> <span class="n">BetterRandom</span>
+</pre></div>
+
+
+<p>Since we used pip to deploy the two distributions, we want to exclude these distributions in the applications requirements.txt. Instead, we will deploy all co-developed distributions seperately in production.</p>
+<div class="highlight"><pre><span></span>pip freeze --exclude-editable &gt; requirements.txt
+</pre></div>
+
+
+<h2>Class Factories</h2>
+<p>This section is flask-app sepcific, but the principle applies everywhere.</p>
+<p>This application is a flask micro-service, and does not need a "main" anywhere. Services like uwsgi and flask commandline expect to find a callable object in a module.</p>
+<p>I created a module called flask_app.py inside randomwebapp which creates a global app object using a class factory which lives inside another module create_app.py.</p>
+<p>Hence the module we want to define in uwsgi.ini becomes randomwebapp.flask_app.</p>
+<div class="highlight"><pre><span></span><span class="na">module</span> <span class="o">=</span> <span class="s">randomweb_app.flask_app</span>
+<span class="na">callable</span> <span class="o">=</span> <span class="s">app</span>
+</pre></div>
+
+
+<p>The class factory function create_app.create_app does flask initializaiton based on the passed configuration. This is now the only user object we want to expose in my package's namespace, as it will be useful in testing.</p>
+<h2>Test cases and code coverage</h2>
+<p>With distributed packages, there are a few options for testing. We cannot rely on test-discovery, as we want my tests to be deployable.</p>
+<p>We can exploit the __init__.py again to bring all test classes directly into the namespace of the test package.</p>
+<div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.tests_bettermathlib</span> <span class="kn">import</span> <span class="n">BetterMathTestCases</span>
+</pre></div>
+
+
+<p>Now unittests can be run via the unittest module. We can choose to run both the test packages together or seperately.</p>
+<div class="highlight"><pre><span></span>python -m unittest randomwebapp_tests bettermathlib_tests
+</pre></div>
+
+
+<p>For Flask we can use a flask command-line-interface property to explicitly define all the test packages that verify this application.</p>
+<div class="highlight"><pre><span></span><span class="n">app</span> <span class="o">=</span> <span class="n">create_app</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;FLASK_CONFIG&#39;</span><span class="p">)</span> <span class="ow">or</span> <span class="s1">&#39;default&#39;</span><span class="p">)</span>
+
+<span class="nd">@app.cli.command</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">test</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Run the unit tests.&quot;&quot;&quot;</span>
+    <span class="kn">import</span> <span class="nn">unittest</span>
+    <span class="n">testmodules</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">&#39;bettermathlib_tests&#39;</span><span class="p">,</span>
+        <span class="s1">&#39;randomwebapp_tests&#39;</span><span class="p">,</span>
+    <span class="p">]</span>
+    <span class="n">suite</span> <span class="o">=</span> <span class="n">unittest</span><span class="o">.</span><span class="n">TestSuite</span><span class="p">()</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">testmodules</span><span class="p">:</span>
+        <span class="n">suite</span><span class="o">.</span><span class="n">addTest</span><span class="p">(</span><span class="n">unittest</span><span class="o">.</span><span class="n">defaultTestLoader</span><span class="o">.</span><span class="n">loadTestsFromName</span><span class="p">(</span><span class="n">t</span><span class="p">))</span>
+    <span class="n">unittest</span><span class="o">.</span><span class="n">TextTestRunner</span><span class="p">(</span><span class="n">verbosity</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">suite</span><span class="p">)</span>
+</pre></div>
+
+
+<p>Now flask tests starts working for me -</p>
+<div class="highlight"><pre><span></span><span class="o">(</span>venv<span class="o">)</span> ...&gt;flask <span class="nb">test</span>
+test_better_random <span class="o">(</span>bettermathlib_tests.tests_bettermathlib.BetterMathTestCases<span class="o">)</span> ... ok
+test_app_exists <span class="o">(</span>randomwebapp_tests.tests_basic.BasicsTestCase<span class="o">)</span> ... ok
+test_app_is_testing <span class="o">(</span>randomwebapp_tests.tests_basic.BasicsTestCase<span class="o">)</span> ... ok
+test_home_page <span class="o">(</span>randomwebapp_tests.tests_client.FlaskClientTestCase<span class="o">)</span> ... ok
+
+----------------------------------------------------------------------
+Ran <span class="m">4</span> tests in <span class="m">0</span>.036s
+
+OK
+</pre></div>
+
+
+<p>and code coverage</p>
+<div class="highlight"><pre><span></span>coverage run -m flask <span class="nb">test</span>
+coverage report
+</pre></div>
+
+
+<h2>DockerFiles</h2>
+<p>There are two DockerFiles one for production and one for unit-testing.
+The production docker files installs the packages non-editable.</p>
+<div class="highlight"><pre><span></span>RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install  --no-deps bettermath-lib/
+RUN python3 -m pip install  --no-deps randomweb-app/
+</pre></div>
+
+
+<p>The unittest takes the production docker image and uninstalls the two packages and re-installs them editable.
+This allows us to retrieve code-coverage results from a container execution.</p>
+<div class="highlight"><pre><span></span>RUN python3 -m pip uninstall -y bettermath-lib
+RUN python3 -m pip uninstall -y randomweb-app
+RUN python3 -m pip install  coverage
+RUN python3 -m pip install  --no-deps -e bettermath-lib/
+RUN python3 -m pip install  --no-deps -e randomweb-app/
+</pre></div>                </article>
+            </aside><!-- /#featured -->
+        <section id="extras" class="body">
+                <div class="blogroll">
+                        <h2>links</h2>
+                        <ul>
+                            <li><a href="http://python.org/">Python.org</a></li>
+                            <li><a href="http://flowviewer.azurewebsites.net/">FlowViewer</a></li>
+                        </ul>
+                </div><!-- /.blogroll -->
+                <div class="social">
+                        <h2>social</h2>
+                        <ul>
+
+                            <li><a href="http://twitter.com/rishimaker">twitter</a></li>
+                            <li><a href="http://github.com/cmlzaGk">github</a></li>
+                            <li><a href="https://www.linkedin.com/in/rishi-maker-74a5a713/">linkedin</a></li>
+                        </ul>
+                </div><!-- /.social -->
+        </section><!-- /#extras -->
+
+        <footer id="contentinfo" class="body">
+                <address id="about" class="vcard body">
+                Proudly powered by <a href="http://getpelican.com/">Pelican</a>, which takes great advantage of <a href="http://python.org">Python</a>.
+                </address><!-- /#about -->
+
+                <p>The theme is by <a href="http://coding.smashingmagazine.com/2009/08/04/designing-a-html-5-layout-from-scratch/">Smashing Magazine</a>, thanks!</p>
+        </footer><!-- /#contentinfo -->
+
+</body>
+</html>
