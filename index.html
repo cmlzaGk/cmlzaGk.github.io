@@ -32,8 +32,12 @@
         </address>
 <p>In <a href="/category/python.html">Python</a>.</p>
 <p>tags: <a href="/tag/python.html">python</a> <a href="/tag/flask.html">flask</a> <a href="/tag/docker.html">docker</a> </p>
-</footer><!-- /.post-info --><p>I will walk through a minimal python flask application to highlight the project layout approach I took.</p>
-<p>The driving factor is co-developing a self-contained library class along with the main application</p>
+</footer><!-- /.post-info --><p>I will walk through a sample web application built using python, flask and docker.
+The application invokes a specialized math function in a library co-developed during application development.  </p>
+<p>The aim of this blog is to highlight some project structure best practices, that I learnt and used in my own application.  </p>
+<p>For those not familiar with flask, flask is a small web framework that implements the python WSGI interface.</p>
+<p>WSGI is an application level contract to develop web applications in python. The other side of the contract is implemented by WSGI webservers like UWSGI. </p>
+<p>By no means, these practices are limited to a flask application, and could be applied everywhere.</p>
 <h2>Summary</h2>
 <p>I will highlight the following areas using a sample project which can be found <a href="https://github.com/cmlzaGk/sampleflask">here</a></p>
 <ul>
@@ -145,8 +149,8 @@
 
 <h2>__init__.py</h2>
 <p>__init__.py plays a crucial role in namespacing the package's contents appropriately.</p>
-<p>The class BetterRandom is in module better_random.py. So a consumer of my distribution would have to import bettermathlib.better_random to access BetterRandom. This is not optimal.</p>
-<p>By directly importing BetterRandom in __init__.py we bring BetterRandom to bettermathlib namespace, and then "import bettermathlib" is good enough to access BetterRandom.</p>
+<p>The class BetterRandom is in module better_random.py. So a consumer of my distribution would have to import bettermathlib.better_random to access BetterRandom.</p>
+<p>By directly importing BetterRandom in __init__.py we bring BetterRandom to bettermathlib namespace, and then "import bettermathlib" is a much better import style than "import bettermathlib.better_random"</p>
 <div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">.better_random</span> <span class="kn">import</span> <span class="n">BetterRandom</span>
 </pre></div>
 
