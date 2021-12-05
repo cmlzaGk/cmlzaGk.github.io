@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Creating Matrix Rain On Good Old Terminals</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="Rishi Maker">
+
+    <!-- Le styles -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.min.css" type="text/css" />
+    <style type="text/css">
+      body {
+        padding-top: 60px;
+        padding-bottom: 40px;
+      }
+      .sidebar-nav {
+        padding: 9px 0;
+      }
+      .tag-1 {
+        font-size: 13pt;
+      }
+      .tag-2 {
+        font-size: 10pt;
+      }
+      .tag-2 {
+        font-size: 8pt;
+      }
+      .tag-4 {
+        font-size: 6pt;
+     }
+    </style>
+    <link href="/theme/css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="/theme/css/font-awesome.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments.css" rel="stylesheet">
+
+    <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Le fav and touch icons -->
+    <link rel="shortcut icon" href="/theme/images/favicon.ico">
+    <link rel="apple-touch-icon" href="/theme/images/apple-touch-icon.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="/theme/images/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="/theme/images/apple-touch-icon-114x114.png">
+
+    <link href="/" type="application/atom+xml" rel="alternate" title="cmlzaGk ATOM Feed" />
+
+  </head>
+
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" href="/index.html">cmlzaGk </a>
+          <div class="nav-collapse">
+            <ul class="nav">
+                <li><a href="/pages/about.html">about</a></li>
+                          <li class="divider-vertical"></li>
+                  <li class="active">
+                    <a href="/category/python.html">
+						<i class="icon-folder-open icon-large"></i>Python
+					</a>
+                  </li>
+
+                          <ul class="nav pull-right">
+                                <li><a href="/archives.html"><i class="icon-th-list"></i>Archives</a></li>
+                          </ul>
+
+            </ul>
+            <!--<p class="navbar-text pull-right">Logged in as <a href="#">username</a></p>-->
+          </div><!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="span9" id="content">
+<section id="content">
+        <article>
+                <header>
+                        <h1>
+                                <a href=""
+                                        rel="bookmark"
+                                        title="Permalink to Creating Matrix Rain On Good Old Terminals">
+                                        Creating Matrix Rain On Good Old Terminals
+                                </a>
+                        </h1>
+                </header>
+                <div class="entry-content">
+                <div class="well">
+<footer class="post-info">
+<span class="label">Date</span>
+<abbr class="published" title="2021-12-04T05:47:00-08:00">
+        <i class="icon-calendar"></i>Sat 04 December 2021
+</abbr>
+<span class="label">By</span>
+<a href="/author/rishi-maker.html"><i class="icon-user"></i>Rishi Maker</a>
+<span class="label">Category</span>
+<a href="/category/python.html"><i class="icon-folder-open"></i>Python</a>.
+
+
+<span class="label">Tags</span>
+	<a href="/tag/python.html"><i class="icon-tag"></i>python</a>
+	<a href="/tag/grammar.html"><i class="icon-tag"></i>grammar</a>
+</footer><!-- /.post-info -->                </div>
+                <p>Matrix 4 is releasing this month. Matrix is one of the most influential movies of all time.</p>
+<p>A feature of the movie was the Matrix Rain.</p>
+<p>I went retro this week and scripted the Matrix Rain console application. </p>
+<p>In this blog I will go over how to create matrix rain on a terminal. </p>
+<p>The command line output of the program can be viewed on <a href="https://www.youtube.com/watch?v=uJwc8n0OnQE">Youtube</a></p>
+<h2>Summary</h2>
+<ul>
+<li>What is Matrix Rain?</li>
+<li>Approach</li>
+<li>Character Set</li>
+<li>Flickering Rain</li>
+<li>Enable VT100 mode on Windows 10+</li>
+<li>The Curses Library</li>
+<li>Conclusion</li>
+</ul>
+<p>For reference the entire project can be found <a href="https://github.com/cmlzaGk/mtrixrain/">here</a></p>
+<h2>What is Matrix Rain?</h2>
+<p><a href="https://en.wikipedia.org/wiki/Matrix_digital_rain">Matrix Rain</a> is a visualization of characters falling downwards on a console in the form of rain. </p>
+<h2>Approach</h2>
+<p>The overall approach is naive </p>
+<ul>
+<li>Prepare a buffer</li>
+<li>Repeat forever<ul>
+<li>Clear the screen</li>
+<li>Render the buffer</li>
+<li>Sleep for some time (refresh rate)</li>
+<li>Update the buffer so that all horizontal lines move downwards</li>
+</ul>
+</li>
+</ul>
+<p>This works for most part, except for some challenges that I will take about, as well as how to overcome them.</p>
+<h2>Character Set</h2>
+<p>The Unicode characters and font-family to choose in a terminal-based matrix rain is very important. Two conditions need to be met. </p>
+<p>All characters should be printable on the terminal, and the font-family should be Mono-spaced.</p>
+<p>Mono-spaced means that the letters occupy same amount of horizontal space. </p>
+<p>If this property is not true, then the lines that we print will be scattered, and there will not be an appearance of a vertical flow.</p>
+<p>The default font "Consolas" on Windows terminal is Mono-spaced and meets the requirement. </p>
+<p>I did a manual test to check which Unicode ranges can be displayed on the screen.</p>
+<p>I built this range manually because I noticed that I could not rely isprintable() method of string in python. </p>
+<p>e.g. My console was unable to print 0x16ef, but isprintable() returned True. </p>
+<div class="highlight"><pre><span></span><span class="c1">### https://stackoverflow.com/questions/1477294/generate-random-utf-8-string-in-python</span>
+
+<span class="n">include_ranges</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="p">(</span> <span class="mh">0x0023</span><span class="p">,</span> <span class="mh">0x0026</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x0028</span><span class="p">,</span> <span class="mh">0x007E</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x00A1</span><span class="p">,</span> <span class="mh">0x00AC</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x00AE</span><span class="p">,</span> <span class="mh">0x00FF</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x0100</span><span class="p">,</span> <span class="mh">0x017F</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x0180</span><span class="p">,</span> <span class="mh">0x024F</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x2C60</span><span class="p">,</span> <span class="mh">0x2C7F</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x16A0</span><span class="p">,</span> <span class="mh">0x16F0</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x0370</span><span class="p">,</span> <span class="mh">0x0377</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x037A</span><span class="p">,</span> <span class="mh">0x037E</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x0384</span><span class="p">,</span> <span class="mh">0x038A</span> <span class="p">),</span>
+    <span class="p">(</span> <span class="mh">0x038C</span><span class="p">,</span> <span class="mh">0x038C</span> <span class="p">),</span>
+<span class="p">]</span>
+
+
+<span class="c1"># Used in manual testing</span>
+<span class="k">for</span> <span class="n">current_range</span> <span class="ow">in</span> <span class="n">include_ranges</span> <span class="p">:</span>
+    <span class="k">for</span> <span class="n">code_point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">current_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;0x{:4x} {} {}&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">code_point</span><span class="p">,</span> <span class="nb">chr</span><span class="p">(</span><span class="n">code_point</span><span class="p">),</span> <span class="nb">chr</span><span class="p">(</span><span class="n">code_point</span><span class="p">)</span><span class="o">.</span><span class="n">isprintable</span><span class="p">()))</span>
+
+
+<span class="c1"># Once include_ranges is determined</span>
+<span class="n">ALPHABETS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">chr</span><span class="p">(</span><span class="n">code_point</span><span class="p">)</span> <span class="k">for</span> <span class="n">current_range</span> <span class="ow">in</span> <span class="n">include_ranges</span>
+        <span class="k">for</span> <span class="n">code_point</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">current_range</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">current_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Flickering Rain</h2>
+<p>I am trying to build Matrix Rain using standard library. With that restriction in place, the interesting part is how to clear the terminal.</p>
+<p>The first approach is to invoke a shell call, and call 'cls' on windows, and that is not a bad start.</p>
+<p><img alt="Alt Text" src="/images/flickering_matrix.gif"></p>
+<p>As can be seen, we have achieved a rain effect, but this level of flickering is unacceptable.</p>
+<p>This flickering occurs, because of the time it takes to do an inter-process call, clear and then display our content from another process.</p>
+<p>We have to do better.</p>
+<h2>Enable VT100 mode on Windows 10+</h2>
+<p>The flicker occurs because of the delay within the refresh because clear screen happens in another process. </p>
+<p>There is no standard API to clear the screen. However, starting <a href="https://superuser.com/questions/413073/windows-console-with-ansi-colors-handling/1050078#1050078">Windows 10</a>, console got support for VT100 escape sequences that can be sent to the console.</p>
+<p>It can be enabled using system libraries, however I enabled it by setting a DWORD 'VirtualTerminalLevel' on registry key 'HKEY_CURRENT_USER\Console' to 0x1. </p>
+<p>The following code can test if the console understands VT100 escape sequencing. </p>
+<div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="c1"># send the escape sequence to clear the screen for VT100 compatible console</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">&#39;This should not be visible</span><span class="se">\033</span><span class="s1">[H</span><span class="se">\033</span><span class="s1">[JThis should be first line of the screen&#39;</span><span class="p">)</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+</pre></div>
+
+
+<p>The flicker stops after replacing the 'cls' call with VT100 escape sequences. </p>
+<p><img alt="Alt Text" src="/images/vt100_matrix.gif"></p>
+<p>VT100 controls also allows us to enter color codes, which completes the rendering, because we need that green matrix effect. </p>
+<p><img alt="Alt Text" src="/images/vt100_color_matrix.gif"></p>
+<h2>The Curses Library</h2>
+<p>While we have just seen how to build Matrix Rain on console using standard library, we have however restricted our target consoles to VT100 consoles. </p>
+<p>Besides, there is no standard way to get a terminal's width and height. In the above application, I pass the width and height of the console layout as a parameter. </p>
+<p>This is not ideal. </p>
+<p>All these problems are solved by using a portable library like 'Curses'. Curses is not shipped with the standard Python distribution on Windows. </p>
+<p>However, there are third party Curses library that can be installed using pip. </p>
+<p>The overall approach does not change with Curses, except the library for rendering. </p>
+<p>While using Curses, I did something different - I decided to do async rendering and have veritical channels get drained asynchronously too. </p>
+<p>The output of the Curses implementation is on <a href="https://www.youtube.com/watch?v=uJwc8n0OnQE">Youtube</a></p>
+<h2>Conclusion</h2>
+<p>Console programming still has applications particularly in non-graphical systems that still exist.</p>
+<p>Matrix Rain is a fun problem to learn the techniques. It is simple enough to solve and can have satisfying results. </p>
+<p>See you at the theatres. </p>
+                </div><!-- /.entry-content -->
+        </article>
+</section>
+        </div><!--/span-->
+
+                <div class="span3 well sidebar-nav" id="sidebar">
+<ul class="nav nav-list">
+<li class="nav-header"><h4><i class="icon-external-link"></i>blogroll</h4></li>
+    <li><a href="http://python.org/"><i class="icon-external-link"></i>Python.org</a></li>
+    <li><a href="http://flowviewer.azurewebsites.net/"><i class="icon-external-link"></i>FlowViewer</a></li>
+<li class="nav-header"><h4><i class="icon-home icon-large"></i> social</h4></li>
+    <li><a href="http://twitter.com/rishimaker"><i class="icon-twitter-sign icon-large"></i>twitter</a></li>
+    <li><a href="http://github.com/cmlzaGk"><i class="icon-github-sign icon-large"></i>github</a></li>
+    <li><a href="https://www.linkedin.com/in/rishi-maker-74a5a713/"><i class="icon-linkedin-sign icon-large"></i>linkedin</a></li>
+
+<li class="nav-header"><h4><i class="icon-folder-close icon-large"></i>Categories</h4></li>
+<li>
+<a href="/category/python.html">
+    <i class="icon-folder-open icon-large"></i>Python
+</a>
+</li>
+
+<li class="nav-header"><h4><i class="icon-tags icon-large"></i>Tags</h4></li>
+
+
+</ul>        </div><!--/.well -->
+
+      </div><!--/row-->
+
+      <hr>
+
+      <footer>
+        <address id="about">
+                Proudly powered by <a href="http://pelican.notmyidea.org/">Pelican <i class="icon-external-link"></i></a>,
+                                which takes great advantage of <a href="http://python.org">Python <i class="icon-external-link"></i></a>.
+        </address><!-- /#about -->
+
+        <p>The theme is from <a href="http://twitter.github.com/bootstrap/">Bootstrap from Twitter <i class="icon-external-link"></i></a>,
+                   and <a href="http://fortawesome.github.com/Font-Awesome/">Font-Awesome <i class="icon-external-link"></i></a>, thanks!</p>
+      </footer>
+
+    </div><!--/.fluid-container-->
+
+
+
+    <!-- Le javascript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/theme/js/jquery-1.7.2.min.js"></script>
+    <script src="/theme/js/bootstrap.min.js"></script>
+  </body>
+</html>
