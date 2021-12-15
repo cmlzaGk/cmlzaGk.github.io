@@ -96,8 +96,8 @@
 <p>The Subject is a regular python expression which can resolve to most sequences, dictionary or an object. Patterns can test for a match of length, type, specific index, key, attribute values, inheritance etc.</p>
 <p>As a use case, a typical json handler checks data for states or properties and performs corresponding actions.</p>
 <p>With match pattern, a handler for json data becomes very simple. </p>
-<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_media_blob</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-    <span class="n">match</span> <span class="n">data</span><span class="p">:</span>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_media_blob</span><span class="p">(</span><span class="n">jsondata</span><span class="p">):</span>
+    <span class="n">match</span> <span class="n">jsondata</span><span class="p">:</span>
         <span class="n">case</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;audio&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span> <span class="p">:</span><span class="s1">&#39;mp3&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}:</span>
             <span class="n">render_mp3</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
 
