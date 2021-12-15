@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="cmlzaGk, ">
+
+
+        <title>Structural Pattern Matching in Python // cmlzaGk // </title>
+
+
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/pure/0.3.0/pure-min.css">
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.1.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/theme/css/pure.css">
+    <link rel="stylesheet" href="/theme/css/pygments.css">
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/fitvids/1.0.1/jquery.fitvids.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $(".content").fitVids();
+        });
+    </script>
+</head>
+
+<body>
+<div class="pure-g-r" id="layout">
+    <div class="sidebar sidebar-article pure-u">
+        <header class="header-article">
+            <hgroup>
+                <a href="/author/rishi-maker.html" title="See posts by Rishi Maker">
+                </a>
+                <h2 class="article-info">Rishi Maker</h2>
+                <small class="about-author"></small>
+                <h5>Published</h5>
+                <p>Wed 15 December 2021</p>
+                <a href="/">&larr;Home</a>
+            </hgroup>
+        </header>
+    </div>
+    <div class="pure-u">
+        <div class="content">
+            <section class="post">
+                <header class="post-header">
+                    <h1>Structural Pattern Matching in Python</h1>
+                        <p class="post-meta">
+                            // under                                 <a class="post-category" href="/tag/python.html">python</a>
+                                <a class="post-category" href="/tag/python310.html">python3.10</a>
+                        </p>
+                </header>
+            </section>
+            <p>Python 3.10 was released in October 2021. </p>
+<p>A major highlight of the release is a new language feature called Structural Pattern Matching.  </p>
+<p>Structural Pattern Matching was made famous in Scala but is found explicitly or implicitly in many languages.</p>
+<p>It is a key paradigm of modern programming. </p>
+<p>In this blog, I will share my thoughts on this feature. </p>
+<p>I will cover why it is important, and how to approach it, but this is not a tutorial of the feature. </p>
+<p>I encourage reading <a href="https://www.python.org/dev/peps/pep-0636/">PEP 636</a>, which is a complete tutorial of the feature IMO.  </p>
+<h2>Links</h2>
+<p><a href="https://www.python.org/dev/peps/pep-0636/">PEP 636</a> Structural Pattern Matching: Tutorial</p>
+<p><a href="https://www.python.org/dev/peps/pep-0634/">PEP 634</a> Structural Pattern Matching: Specification</p>
+<p><a href="https://www.python.org/dev/peps/pep-0635/">PEP 635</a> Structural Pattern Matching: Motivation and Rationale</p>
+<h2>Contents</h2>
+<ul>
+<li>What is Structural Pattern Matching?</li>
+<li>Motivation and Applications</li>
+<li>Pattern is not an expression</li>
+<li>Performance </li>
+<li>Conclusion</li>
+</ul>
+<h2>What is Structural Pattern Matching?</h2>
+<p>Structural Pattern Matching is a programming technique that takes a Subject and a set of Patterns and performs a pattern test on structure and state. </p>
+<p>A successful pattern match results in execution of a block of code corresponding to the Pattern. </p>
+<p>In typical usage, a side effect of pattern matching is name-binding, which live in enclosing scope. </p>
+<p>Python 3.10 implements this by introduction of a new statement called the “match” statement. Typical usage is as follows</p>
+<div class="highlight"><pre><span></span><span class="n">match</span> <span class="n">subject_expr</span><span class="p">:</span> 
+    <span class="n">case</span> <span class="n">pat1</span><span class="p">:</span> 
+        <span class="n">do_something</span><span class="p">()</span>
+    <span class="n">case</span> <span class="n">pat2</span><span class="p">:</span> 
+        <span class="n">do_something_else</span><span class="p">()</span>
+</pre></div>
+
+
+<p>In effect, match statement is a replacement for something like </p>
+<div class="highlight"><pre><span></span><span class="k">if</span> <span class="n">matches</span><span class="p">(</span><span class="n">expr1</span><span class="p">,</span> <span class="n">pat1</span><span class="p">)</span> <span class="p">:</span> 
+    <span class="n">do_something</span><span class="p">()</span>
+<span class="k">elif</span> <span class="n">matches</span><span class="p">(</span><span class="n">expr2</span><span class="p">,</span> <span class="n">pat2</span><span class="p">):</span>
+    <span class="n">do_something_else</span><span class="p">()</span>
+</pre></div>
+
+
+<p>I will use “match statement" interchangeably with “Structural Pattern Matching” for the remaining sections of the blog. </p>
+<h2>Motivation and Applications</h2>
+<p>The match statement is usable in places where different blocks of code need to be executed based on the structure or state of the data. This means that it can be used in a lot of different places. </p>
+<p>The motivation to use a match statement is to simplify the code and make it more readable. </p>
+<p>The Subject is a regular python expression which can resolve to most sequences, dictionary or an object. Patterns can test for a match of length, type, specific index, key, attribute values, inheritance etc.</p>
+<p>As a use case, a typical json handler checks data for states or properties and performs corresponding actions.</p>
+<p>With match pattern, a handler for json data becomes very simple. </p>
+<div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">process_media_blob</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
+    <span class="n">match</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">case</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;audio&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span> <span class="p">:</span><span class="s1">&#39;mp3&#39;</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}:</span>
+            <span class="n">render_mp3</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+
+        <span class="n">case</span> <span class="p">{</span><span class="s1">&#39;type&#39;</span><span class="p">:</span><span class="s1">&#39;video&#39;</span><span class="p">,</span> <span class="s1">&#39;format&#39;</span> <span class="p">:</span> <span class="p">(</span><span class="s1">&#39;webm&#39;</span> <span class="o">|</span> <span class="s1">&#39;mkv&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">videoformat</span><span class="p">,</span> <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="n">data</span><span class="p">}:</span>
+            <span class="n">render_video</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">videoformat</span><span class="p">)</span>
+
+        <span class="n">case</span> <span class="n">_</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">MediaInputException</span><span class="p">(</span><span class="s1">&#39;Usage: .... &#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<p>The above match statement performed the necessary tests for presence of keys and their expected values elegantly. </p>
+<p>It also introduced ‘data’ and ‘format’ values to the scope namespace as ‘data’ and ‘videoformat’ respectively.  </p>
+<p>The above is an example when the subject is a dictionary. <a href="https://www.python.org/dev/peps/pep-0636/">PEP 636</a> exhausts use cases for data-structures like list, class, tuples etc. </p>
+<h2>Pattern is not an expression</h2>
+<p>An important thing to remember is that a Pattern is not a Python expression, even though under certain situations it looks exactly like a Python expression. </p>
+<p>A Pattern has completely different grammar rules from an expression. </p>
+<p>As an example below, <code>Point(x=0, y=1)</code> as an expression instantiates an object. The same as a Pattern statement is a rule check.</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">Point</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span>
+
+<span class="n">p</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">match</span> <span class="n">p</span><span class="p">:</span>
+    <span class="n">case</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39;p is an object of class Point with attributes x as 0 and y as 1&#39;</span><span class="p">)</span>
+    <span class="n">case</span> <span class="n">_</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s1">&#39; p is something else&#39;</span><span class="p">)</span>
+</pre></div>
+
+
+<h2>Performance</h2>
+<p>The match clause is functionally equivalent to “if .. elif .. “ tests. </p>
+<p>Even for potentially problematic patterns like sequences, constraints are in place to keep processing fast. </p>
+<p>E.g., The greedy operator ‘*’ in sequence patterns can only be used once in a pattern. </p>
+<p>The Pattern is a language specific rule and not a regular expression. </p>
+<p>Hence performance is equivalent to the earlier alternate patterns of "if .. elif ..". </p>
+<h2>Conclusion</h2>
+<p>Structural Pattern Matching is a very exciting addition to the Python language. </p>
+<p>Scala has already shown why this is a very popular and modern style of programming. </p>
+<p>Portions of python language already use the match clause to simplify existing code. </p>
+<p>Match statement is a language feature. Understanding it is not just useful for writing elegant code but also to read future Python code. </p>
+            <div class="hr"></div>
+            <a href="#" class="go-top">Go Top</a>
+<footer class="footer">
+    <p>&copy; cmlzaGk &ndash;
+        Built with <a href="https://github.com/PurePelicanTheme/pure">Pure Theme</a>
+        for <a href="http://blog.getpelican.com/">Pelican</a>
+    </p>
+</footer>        </div>
+    </div>
+</div>
+    <script>
+        var $top = $('.go-top');
+
+        // Show or hide the sticky footer button
+        $(window).scroll(function() {
+            if ($(this).scrollTop() > 200) {
+                $top.fadeIn(200);
+            } else {
+                $top.fadeOut(200);
+            }
+        });
+
+        // Animate the scroll to top
+        $top.click(function(event) {
+            event.preventDefault();
+            $('html, body').animate({scrollTop: 0}, 300);
+        })
+
+        // Makes sure that the href="#" attached to the <a> elements
+        // don't scroll you back up the page.
+        $('body').on('click', 'a[href="#"]', function(event) {
+            event.preventDefault();
+        });
+    </script>
+</body>
+</html>
